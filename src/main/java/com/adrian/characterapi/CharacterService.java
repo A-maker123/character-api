@@ -45,9 +45,9 @@ public class CharacterService {
         characterRepository.delete(existingCharacter);
     }
 
-    public List<Character> searchCharactersByName(String name) {
-        return characterRepository.findByNameContainingIgnoreCase(name);
-    }
+   public List<Character> searchCharactersByName(String name) {
+    return characterRepository.findByNameContainingCustom(name);
+}
 
     public List<Character> getCharactersByField(String field, String value) {
        return switch (field.toLowerCase()) {
