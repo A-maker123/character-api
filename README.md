@@ -94,7 +94,7 @@ POST /api/character/
 
 **Request Body**: character object with the following fields:
 
-- `name` (String, required): Student's full name
+- `name` (String, required): Character's full name
 - `description` (String, required, unique): characters description
 - `universe` (String, optional): chracters universe
 - `species` (String, optional): chacters speices 
@@ -102,7 +102,7 @@ POST /api/character/
 **Response**:
 
 - **Status Code**: `200 OK` (if created successfully)
-- **Body**: Created Student object with assigned `characterId`
+- **Body**: Created Character object with assigned `characterId`
 
 #### Example Request
 ```bash
@@ -129,13 +129,13 @@ curl -X POST http://localhost:8080/api/character/ \
 ```http
 PUT /characters/{id}
 ```
-**Description**: Update an existing student's information.
+**Description**: Update an existing Character's information.
 
 **Path Parameters**:
 
-- `id` (Long, required): The ID of the student to update
+- `id` (Long, required): The ID of the character to update
 
-**Request Body**: Student object with fields to update:
+**Request Body**: Character object with fields to update:
 
 - `name` (String): Updated name
 - `description` (String): Updated description
@@ -144,8 +144,8 @@ PUT /characters/{id}
 
 **Response**:
 
-- **Status Code**: `200 OK` (if updated successfully) or `404 Not Found` (if student not found)
-- **Body**: Updated Student object
+- **Status Code**: `200 OK` (if updated successfully) or `404 Not Found` (if Character not found)
+- **Body**: Updated Character object
 
 #### Example Request
 ```bash
@@ -232,7 +232,7 @@ curl "http://localhost:8080/characters/filter?field=species&value=Hobbit"
 ```http
 GET /characters/search?name={substring}
 ```
-**Description**: Search for character by name (partial match supported) or retrieve all students if no name is provided.
+**Description**: Search for character by name (partial match supported) or retrieve all character if no name is provided.
 
 **Query Parameters**:
 
