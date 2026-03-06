@@ -50,13 +50,10 @@ public class CharacterService {
     }
 
     public List<Character> getCharactersByField(String field, String value) {
-        switch (field.toLowerCase()) {
-            case "universe":
-                return characterRepository.findByUniverseIgnoreCase(value);
-            case "species":
-                return characterRepository.findBySpeciesIgnoreCase(value);
-            default:
-                throw new IllegalArgumentException("Invalid filter field: " + field);
-        }
+       return switch (field.toLowerCase()) {
+            case "universe" -> characterRepository.findByUniverseIgnoreCase(value);
+            case "species" -> characterRepository.findBySpeciesIgnoreCase(value);
+            default -> throw new IllegalArgumentException("Invalid filter field: " + field);
+        };
     }
 }
