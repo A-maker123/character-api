@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="CSS/styles.css">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
@@ -16,7 +16,7 @@
   <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="index.html">Middle-earth Gallery</a>
+      <a class="navbar-brand" href="/characters">Middle-earth Gallery</a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
         <span class="navbar-toggler-icon"></span>
@@ -25,16 +25,16 @@
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="/characters">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="details.html">Details</a>
+            <a class="nav-link" href="/character-details.ftlh">Details</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="about.html">About</a>
+            <a class="nav-link" href="/about">About</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="new-character-form.html">Add a Character</a>
+            <a class="nav-link" href="/characters/create">Add a Character</a>
           </li>
         </ul>
       </div>
@@ -51,7 +51,7 @@
   <section class="row g-4 align-items-center">
     <div class="col-lg-6">
       <div class="card shadow-sm">
-            <img src="Images/shire.jpeg" class="card-img-top" alt="The Shire">
+            <img src="/Images/shire.jpeg" class="card-img-top" alt="The Shire">
       </div>
     </div>
 
@@ -80,6 +80,6 @@
 
 
   <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootsstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
