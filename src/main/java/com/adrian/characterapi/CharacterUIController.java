@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class CharacterUIController {
@@ -46,10 +47,11 @@ public class CharacterUIController {
     }
 
     @PostMapping("/characters/create")
-    public String createCharacter(Character character) {
-        Character savedCharacter = characterService.addCharacter(character);
-        return "redirect:/characters/" + savedCharacter.getCharacterId();
-    }
+public String createCharacter(Character character,
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    Character savedCharacter = characterService.addCharacter(character, imageFile);
+    return "redirect:/characters/" + savedCharacter.getCharacterId();
+}
 
     @GetMapping("/characters/updateForm/{id}")
     public String showUpdateForm(@PathVariable Long id, Model model) {
@@ -60,10 +62,11 @@ public class CharacterUIController {
     }
 
     @PostMapping("/characters/update")
-    public String updateCharacter(Character character) {
-        Character updatedCharacter = characterService.updateCharacter(character.getCharacterId(), character);
-        return "redirect:/characters/" + updatedCharacter.getCharacterId();
-    }
+public String updateCharacter(Character character,
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    Character updatedCharacter = characterService.updateCharacter(character.getCharacterId(), character, imageFile);
+    return "redirect:/characters/" + updatedCharacter.getCharacterId();
+}
 
     @GetMapping("/characters/delete/{id}")
     public String deleteCharacter(@PathVariable Long id) {

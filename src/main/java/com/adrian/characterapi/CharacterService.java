@@ -1,13 +1,23 @@
 package com.adrian.characterapi;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     public CharacterService(CharacterRepository characterRepository) {
         this.characterRepository = characterRepository;
@@ -26,6 +36,11 @@ public class CharacterService {
         return characterRepository.save(character);
     }
 
+    public Character addCharacter(Character character, MultipartFile imageFile) {
+    handleImageUpload(character, imageFile);
+    return characterRepository.save(character);
+}
+
     public Character updateCharacter(Long id, Character updatedCharacter) {
         Character existingCharacter = characterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Character not found with id: " + id));
@@ -34,6 +49,25 @@ public class CharacterService {
         existingCharacter.setDescription(updatedCharacter.getDescription());
         existingCharacter.setUniverse(updatedCharacter.getUniverse());
         existingCharacter.setSpecies(updatedCharacter.getSpecies());
+        existingCharacter.setImageUrl(updatedCharacter.getImageUrl());
+
+        return characterRepository.save(existingCharacter);
+    }
+
+    public Character updateCharacter(Long id, Character updatedCharacter, MultipartFile imageFile) {
+        Character existingCharacter = characterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Character not found with id: " + id));
+
+        existingCharacter.setName(updatedCharacter.getName());
+        existingCharacter.setDescription(updatedCharacter.getDescription());
+        existingCharacter.setUniverse(updatedCharacter.getUniverse());
+        existingCharacter.setSpecies(updatedCharacter.getSpecies());
+
+        if (updatedCharacter.getImageUrl() != null && !updatedCharacter.getImageUrl().isBlank()) {
+            existingCharacter.setImageUrl(updatedCharacter.getImageUrl());
+        }
+
+        handleImageUpload(existingCharacter, imageFile);
 
         return characterRepository.save(existingCharacter);
     }
@@ -45,15 +79,44 @@ public class CharacterService {
         characterRepository.delete(existingCharacter);
     }
 
-   public List<Character> searchCharactersByName(String name) {
-    return characterRepository.findByNameContainingCustom(name);
-}
+    public List<Character> searchCharactersByName(String name) {
+        return characterRepository.findByNameContainingCustom(name);
+    }
 
     public List<Character> getCharactersByField(String field, String value) {
-       return switch (field.toLowerCase()) {
+        return switch (field.toLowerCase()) {
             case "universe" -> characterRepository.findByUniverseIgnoreCase(value);
             case "species" -> characterRepository.findBySpeciesIgnoreCase(value);
             default -> throw new IllegalArgumentException("Invalid filter field: " + field);
         };
     }
+
+    private void handleImageUpload(Character character, MultipartFile imageFile) {
+    if (imageFile == null || imageFile.isEmpty()) {
+        return;
+    }
+
+    try {
+        Files.createDirectories(Paths.get(UPLOAD_DIR));
+
+        String originalFileName = imageFile.getOriginalFilename();
+        String extension = "";
+
+        if (originalFileName != null && originalFileName.contains(".")) {
+            extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        }
+
+        String fileName = UUID.randomUUID() + extension;
+        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+
+        try (InputStream inputStream = imageFile.getInputStream()) {
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        character.setUploadedImageName(fileName);
+
+    } catch (IOException e) {
+        throw new RuntimeException("Failed to upload image", e);
+    }
+}
 }
