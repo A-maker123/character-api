@@ -84,6 +84,7 @@ public class Character {
     public void setSpecies(String species) {
         this.species = species;
     }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -91,6 +92,7 @@ public class Character {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
     public String getUploadedImageName() {
         return uploadedImageName;
     }
@@ -98,42 +100,29 @@ public class Character {
     public void setUploadedImageName(String uploadedImageName) {
         this.uploadedImageName = uploadedImageName;
     }
+
     @Transient
-public String getDisplayImagePath() {
-    if (uploadedImageName != null && !uploadedImageName.isBlank()) {
-        return "/uploads/" + uploadedImageName;
-    }
-
-    if (imageUrl != null && !imageUrl.isBlank()) {
-        return imageUrl;
-    }
-
-    if (name != null) {
-        switch (name.trim()) {
-            case "Bilbo Baggins" -> {
-                return "/Images/Bilbo.jpeg";
-            }
-            case "Gandalf" -> {
-                return "/Images/Gandalf.jpeg";
-            }
-            case "Elrond" -> {
-                return "/Images/Elrond2.webp";
-            }
-            case "Thorin Oakenshield" -> {
-                return "/Images/Thorin.jpeg";
-            }
-            case "Peregrin Took" -> {
-                return "/Images/Pippin Took.jpg";
-            }
-            case "Aragorn" -> {
-                return "/Images/Aragorn.jpeg";
-            }
+    public String getDisplayImagePath() {
+        if (uploadedImageName != null && !uploadedImageName.isBlank()) {
+            return "/uploads/" + uploadedImageName;
         }
+
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            return imageUrl;
+        }
+
+        if (name != null) {
+            return switch (name.trim()) {
+                case "Bilbo Baggins" -> "/Images/Bilbo.jpeg";
+                case "Gandalf" -> "/Images/Gandalf.jpeg";
+                case "Elrond" -> "/Images/Elrond2.webp";
+                case "Thorin Oakenshield" -> "/Images/Thorin.jpeg";
+                case "Peregrin Took" -> "/Images/Pippin Took.jpg";
+                case "Aragorn" -> "/Images/Aragorn.jpeg";
+                default -> "/Images/shire.jpeg";
+            };
+        }
+
+        return "/Images/shire.jpeg";
     }
-
-    return "/Images/default-character.jpg";
-}
-
-
-
 }

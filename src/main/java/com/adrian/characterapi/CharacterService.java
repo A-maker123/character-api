@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
-
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+    private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath().normalize();
 
     public CharacterService(CharacterRepository characterRepository) {
         this.characterRepository = characterRepository;
@@ -33,24 +33,21 @@ public class CharacterService {
     }
 
     public Character addCharacter(Character character) {
+        normalizeImageFields(character);
         return characterRepository.save(character);
     }
 
     public Character addCharacter(Character character, MultipartFile imageFile) {
-    handleImageUpload(character, imageFile);
-    return characterRepository.save(character);
-}
+        normalizeImageFields(character);
+        handleImageUpload(character, imageFile);
+        return characterRepository.save(character);
+    }
 
     public Character updateCharacter(Long id, Character updatedCharacter) {
         Character existingCharacter = characterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Character not found with id: " + id));
 
-        existingCharacter.setName(updatedCharacter.getName());
-        existingCharacter.setDescription(updatedCharacter.getDescription());
-        existingCharacter.setUniverse(updatedCharacter.getUniverse());
-        existingCharacter.setSpecies(updatedCharacter.getSpecies());
-        existingCharacter.setImageUrl(updatedCharacter.getImageUrl());
-
+        applyCharacterUpdates(existingCharacter, updatedCharacter);
         return characterRepository.save(existingCharacter);
     }
 
@@ -58,16 +55,16 @@ public class CharacterService {
         Character existingCharacter = characterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Character not found with id: " + id));
 
-        existingCharacter.setName(updatedCharacter.getName());
-        existingCharacter.setDescription(updatedCharacter.getDescription());
-        existingCharacter.setUniverse(updatedCharacter.getUniverse());
-        existingCharacter.setSpecies(updatedCharacter.getSpecies());
+        applyCharacterUpdates(existingCharacter, updatedCharacter);
 
-        if (updatedCharacter.getImageUrl() != null && !updatedCharacter.getImageUrl().isBlank()) {
-            existingCharacter.setImageUrl(updatedCharacter.getImageUrl());
+        if (imageFile != null && !imageFile.isEmpty()) {
+            deleteUploadedImageIfPresent(existingCharacter.getUploadedImageName());
+            handleImageUpload(existingCharacter, imageFile);
+        } else if (StringUtils.hasText(updatedCharacter.getImageUrl())) {
+            deleteUploadedImageIfPresent(existingCharacter.getUploadedImageName());
+            existingCharacter.setUploadedImageName(null);
+            existingCharacter.setImageUrl(updatedCharacter.getImageUrl().trim());
         }
-
-        handleImageUpload(existingCharacter, imageFile);
 
         return characterRepository.save(existingCharacter);
     }
@@ -76,6 +73,7 @@ public class CharacterService {
         Character existingCharacter = characterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Character not found with id: " + id));
 
+        deleteUploadedImageIfPresent(existingCharacter.getUploadedImageName());
         characterRepository.delete(existingCharacter);
     }
 
@@ -91,32 +89,72 @@ public class CharacterService {
         };
     }
 
+    private void applyCharacterUpdates(Character existingCharacter, Character updatedCharacter) {
+        existingCharacter.setName(updatedCharacter.getName());
+        existingCharacter.setDescription(updatedCharacter.getDescription());
+        existingCharacter.setUniverse(updatedCharacter.getUniverse());
+        existingCharacter.setSpecies(updatedCharacter.getSpecies());
+
+        if (StringUtils.hasText(updatedCharacter.getImageUrl())) {
+            existingCharacter.setImageUrl(updatedCharacter.getImageUrl().trim());
+        }
+    }
+
+    private void normalizeImageFields(Character character) {
+        if (character.getImageUrl() != null) {
+            character.setImageUrl(character.getImageUrl().trim());
+            if (character.getImageUrl().isEmpty()) {
+                character.setImageUrl(null);
+            }
+        }
+
+        if (character.getUploadedImageName() != null) {
+            character.setUploadedImageName(character.getUploadedImageName().trim());
+            if (character.getUploadedImageName().isEmpty()) {
+                character.setUploadedImageName(null);
+            }
+        }
+    }
+
     private void handleImageUpload(Character character, MultipartFile imageFile) {
-    if (imageFile == null || imageFile.isEmpty()) {
-        return;
-    }
-
-    try {
-        Files.createDirectories(Paths.get(UPLOAD_DIR));
-
-        String originalFileName = imageFile.getOriginalFilename();
-        String extension = "";
-
-        if (originalFileName != null && originalFileName.contains(".")) {
-            extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        if (imageFile == null || imageFile.isEmpty()) {
+            return;
         }
 
-        String fileName = UUID.randomUUID() + extension;
-        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        try {
+            Files.createDirectories(UPLOAD_DIR);
 
-        try (InputStream inputStream = imageFile.getInputStream()) {
-            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            String originalFileName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+            String extension = "";
+
+            if (originalFileName != null && originalFileName.contains(".")) {
+                extension = originalFileName.substring(originalFileName.lastIndexOf('.'));
+            }
+
+            String fileName = UUID.randomUUID() + extension;
+            Path filePath = UPLOAD_DIR.resolve(fileName);
+
+            try (InputStream inputStream = imageFile.getInputStream()) {
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            character.setUploadedImageName(fileName);
+            character.setImageUrl(null);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload image", e);
+        }
+    }
+
+    private void deleteUploadedImageIfPresent(String uploadedImageName) {
+        if (!StringUtils.hasText(uploadedImageName)) {
+            return;
         }
 
-        character.setUploadedImageName(fileName);
-
-    } catch (IOException e) {
-        throw new RuntimeException("Failed to upload image", e);
+        try {
+            Files.deleteIfExists(UPLOAD_DIR.resolve(uploadedImageName));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete image file", e);
+        }
     }
-}
 }
