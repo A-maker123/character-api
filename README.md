@@ -265,3 +265,18 @@ curl "http://localhost:8080/characters/search?name=gan"
 ---
 ### Demo-Video
 https://uncg-my.sharepoint.com/:v:/g/personal/afescobar_uncg_edu/IQD7vKqz9wuNTJs6yuJiuqDbAUL8p-yPu3kDHDbdZiW7Mo0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=oV8GMy
+
+
+## MVC Demo Video
+
+This video demonstrates the full functionality of the application, including:
+- Viewing all characters
+- Viewing character details
+- Adding a new character
+- Editing an existing character
+- Deleting a character
+- Handling error cases
+
+[Watch the demo here](https://your-onedrive-link-here)
+
+https://uncg-my.sharepoint.com/:v:/g/personal/afescobar_uncg_edu/IQCoGHkOUatnSIEJa7WdirSoAb3I_7JSaPvbL2X-6qmvFQ8?e=vwN22o
